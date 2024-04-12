@@ -1,6 +1,11 @@
 /* Simulação 1: G/G/1/5 Chegada: 2..5 Saída: 3..5
  * Simulação 2: G/G/2/5 Chegada: 2..5 Saída: 3..5
  * 
+ * Para ambas simulações, considere inicialmente a fila vazia e o primeiro cliente chega no tempo 2,0.
+ * Realize a simulação com 100.000 aleatórios, ou seja, ao se utilizar o 100.000 aleatório, sua simulação deve se encerrar e a
+ * distribuição de probabilidades, bem como os tempos acumulados para os estados da fila devem ser reportados. Além disso,
+ * indique o número de perda de clientes (caso tenha havido perda) e o tempo global da simulação.
+ * 
  * A/B/C/K/N/D
  * A: distribuição do intervalo de chegada
  * B: distribuição do intervalo de saída
@@ -15,31 +20,27 @@ public class Simulador {
 
 	public static void main(String[] args)
 	{
-		//Variáveis de controle da simulação
-		double tempoGlobal = 0;
-		int count = 100000;
+		
+		double tempoGlobal = 0; 
+		int count = 100000; //Variável de controle da simulação
 
-		//Iniciar a fila
-		Fila fila = new Fila(1, 5); //Estados totais da fila: K+1 
-		System.out.println(fila.toString()+"\n");
+		Fila fila = new Fila(1, 5); //Iniciar a fila
+		System.out.println("Estado inicial da fila: " + fila.toString()+"\n");
 
-		//Intervalos médios de chegada e de saída
-		double saidaT0 = 3.0, saidaT1 = 5.0, chegadaT0 = 2.0, chegadaT1 = 5.0;
+		double saidaT0 = 3.0, saidaT1 = 5.0, chegadaT0 = 2.0, chegadaT1 = 5.0; //Intervalos médios de chegada e de saída
 
-		//Iniciar gerador e suas variáveis
-		double seed = 2.0, a = 2145853745, c = 1432159778, M = Math.pow(2, 32);
-		Gerador gerador = new Gerador(seed, a, c, M);
+		double seed = 2.0, a = 2145853745, c = 1432159778, M = Math.pow(2, 32); //Parâmetros do Gerador de Números Pseudoaleatórios
+		Gerador gerador = new Gerador(seed, a, c, M); //Iniciar o Gerador
 
-		//Iniciar escalonador
-		Escalonador escalonador = new Escalonador();
+		Escalonador escalonador = new Escalonador(); //Iniciar escalonador
 
-		//Declarar o primeiro evento da simulação e adicioná-lo ao Escalonador
-		Evento eventoInicial = new Evento (2.0, "CH");
-		escalonador.eventoQueue.add(eventoInicial);
+		Evento eventoInicial = new Evento (2.0, "CH"); //Evento inicial da Simulação 
+		escalonador.eventoQueue.add(eventoInicial); //Evento inicial adicionado ao Escalonador
 
 		for (int i = 0; i < count; i++)
 		{
 			System.out.println("Iteraçao: " + i);
+
 			//Ver qual o próximo evento do escalonador (o elemento no topo da Priority Queue)
 			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTempo(), escalonador.eventoQueue.poll().getTipo());
 			System.out.println("Próximo evento do escalonador: " + eventoAux.toString());
@@ -128,15 +129,20 @@ public class Simulador {
 
 		}//End loop principal da Simulação
 
-		System.out.println("Fim da simulação.");
+		System.out.println("Fim da simulação.\n");
+		System.out.println("Distribuição de Probabilidades: \n");
 
 		for (int i = 0; i < fila.estados.length; i++) {
 			System.out.println
 				("Estado["+i+"]"
 				+ " Tempo: " + (String.format("%,.2f", fila.estados[i]))
-				+ " Probabilidade: "+(String.format ("%,.10f",(fila.estados[i] / tempoGlobal))));
+				+ " Probabilidade: "+(String.format ("%,.10f",(fila.estados[i] / tempoGlobal)))
+				);
 		}
-	
+		
+		System.out.println("\n" + fila.toString() + "\n");
+		System.out.println("Tempo Global de Simulação: " + tempoGlobal);
+		
 	}//End main
 
 }//End class
