@@ -1,4 +1,6 @@
-## Trabalho da disciplina Simulação e Métodos Analíticos do curso de Engenharia de Software da PUCRS.
+# Trabalho da disciplina de Simulação e Métodos Analíticos
+## Engenharia de Software
+### PUCRS
 
 #### Esta versão imprime no console a descrição de todo o processo do algoritmo de Simulação ao executar a classe Simulador.java.
 
