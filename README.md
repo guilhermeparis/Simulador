@@ -24,11 +24,11 @@ Acumular tempo no estado 0 da fila: 2.0<br>
 Incrementar fila -> clientes: 1<br>
 Está de frente para o servidor? true -> Agendar saída.<br>
 X: 2.0 a: 2.145853745E9 c: 1.432159778E9 M: 4.294967296E9<br>
-Número Pseudoaleatório gerado:: 0.3326917001977563.<br>
+Número Pseudoaleatório gerado: 0.3326917001977563.<br>
 Evento gerado: [SA, 5.665383400395513]<br>
 Fim do algoritmo. Agendar nova chegada.<br>
 X: 1.428899972E9 a: 2.145853745E9 c: 1.432159778E9 M: 4.294967296E9<br>
-Número Pseudoaleatório gerado:: 0.133223295211792.<br>
+Número Pseudoaleatório gerado: 0.133223295211792.<br>
 Evento gerado: [CH, 4.399669885635376]<br>
 Fila [Status=1, Capacidade=5, Servidores=1, Atendidos=0, Perdas=0, Estados=[2.0, 0.0, 0.0, 0.0, 0.0, 0.0]]<br>
 
