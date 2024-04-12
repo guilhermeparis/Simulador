@@ -48,22 +48,23 @@ public class Simulador {
 			if (eventoAux.getTipo() == "CH")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
+				System.out.println("Variação de tempo: " + deltaTempo);
 				tempoGlobal = eventoAux.getTempo();
 				System.out.println("Tempo Global: " + tempoGlobal);
 				System.out.println("Pode entrar na fila (Status=" + fila.getStatus() + " < Capacidade=" + fila.getCapacidade() + ")? " + (fila.getStatus() < fila.getCapacidade()));
 
 				if (fila.getStatus() < fila.getCapacidade())
 				{	
-					System.out.println("Acumular tempo no estado " + fila.getStatus() + " da fila: ");
+					System.out.print("Acumular tempo no estado " + fila.getStatus() + " da fila: ");
 					fila.in(deltaTempo);
 					System.out.println("Incrementar fila -> clientes: " + fila.getStatus());
-					System.out.println("Está de frente para o servidor? " + (fila.status <= fila.servidores) + " -> ");
+					System.out.print("Está de frente para o servidor? " + (fila.status <= fila.servidores) + " -> ");
 
 					if(fila.status <= fila.servidores)
 					{
 						System.out.println("Agendar saída. ");
 						double nps = gerador.next();
-						System.out.println("Número Pseudoaleatório gerado:: " + nps + ". ");
+						System.out.println("Número Pseudoaleatório gerado: " + nps + ". ");
 						double sorteio = saidaT0 + ((saidaT1-saidaT0) * nps);
 						//Evento e1: saída gerada pelo algoritmo de chegada
 						Evento e1 = new Evento ((tempoGlobal + sorteio), "SA");
@@ -83,7 +84,7 @@ public class Simulador {
 				}
 				System.out.println("Fim do algoritmo. Agendar nova chegada. ");
 				double nps = gerador.next();
-				System.out.println("Número Pseudoaleatório gerado:: " + nps + ". ");
+				System.out.println("Número Pseudoaleatório gerado: " + nps + ". ");
 				double sorteio =  chegadaT0 + ((chegadaT1 - chegadaT0) * nps);
 				//Evento e2: chegada gerada pelo algoritmo de chegada
 				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH");
@@ -93,6 +94,7 @@ public class Simulador {
 			else if (eventoAux.getTipo() == "SA")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
+				System.out.println("Variação de tempo: " + deltaTempo);
 				tempoGlobal = eventoAux.getTempo(); 
 				System.out.println("Tempo Global: " + tempoGlobal);
 				System.out.print("Acumular tempo no estado " + fila.getStatus() + " da fila: ");
@@ -102,7 +104,7 @@ public class Simulador {
 				System.out.print("Há mais clientes para atender? ");
 				if (fila.status >= fila.servidores)
 				{
-					System.out.println((fila.status >= fila.servidores) + ": agendar uma saída.");
+					System.out.println((fila.status >= fila.servidores) + ": Agendar uma saída.");
 					double nps = gerador.next();
 					System.out.println("Número Pseudoaleatório gerado: " + nps + ". ");
 					double sorteio = saidaT0 + ((saidaT1-saidaT0) * nps);
