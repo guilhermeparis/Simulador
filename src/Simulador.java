@@ -133,7 +133,7 @@ public class Simulador {
 		for (int i = 0; i < fila.estados.length; i++) {
 			System.out.println
 				("Estado["+i+"]"
-				+ "Tempo: " + (String.format("%,.2f", fila.estados[i]))
+				+ " Tempo: " + (String.format("%,.2f", fila.estados[i]))
 				+ " Probabilidade: "+(String.format ("%,.10f",(fila.estados[i] / tempoGlobal))));
 		}
 	
