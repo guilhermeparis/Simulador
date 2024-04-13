@@ -42,12 +42,12 @@ Uma breve explicação das informações geradas:
 * **Acumular tempo no estado 0 da fila: 2.0** -- Exibe o valor de tempo a ser acumulado na posição do vetor de estados da fila (deve ser acumulado antes de incrementar o número de clientes na fila).
 * **Incrementar fila -> clientes: 1** -- Parte do algoritmo de chegada. Exibe o número atual de clientes na fila.
 * **Está de frente para o servidor? true -> Agendar saída.** -- Verificação realizada pelo algoritmo de Chegada que mostra se o cliente está de frente para um servidor disponível. Se true, uma saída para esse cliente é agendada; senão, o cliente continua aguardando na fila até estar de frente para um servidor disponível para atendê-lo.
-* **X: 2.0 a: 2.145853745E9 c: 1.432159778E9 M: 4.294967296E9** -- Caso a verificação anterior resulte true, é necessários gerar um número pseudoaleatório. Aqui são exibidos os parâmetros que serão utilizados pelo gerador. É necessário garantir a sequência de números pseudoaleatórios gerados para agendar eventos, para isso a seed (X) será diferente a cada vez que um novo número for gerado.
+* **X: 2.0 a: 2.145853745E9 c: 1.432159778E9 M: 4.294967296E9** -- Caso a verificação anterior resulte true, é necessário gerar um número pseudoaleatório. Aqui são exibidos os parâmetros que serão utilizados pelo gerador. É necessário garantir a sequência de números pseudoaleatórios gerados para agendar eventos, para isso a seed (X) será diferente a cada vez que um novo número for gerado.
 * **Número Pseudoaleatório gerado: 0.3326917001977563.** -- O número pseudoaleatório gerado distribuído uniformemente entre 0 e 1.
 * **Evento gerado: [SA, 5.665383400395513]** -- O evento gerado pelo algoritmo após “encaixá-lo” em um intervalo uniformemente distribuído entre o intervalo de valores médios de chegada ou de saída (a depender do tipo de evento que se deseja gerar). É necessário garantir que o tempo e o tipo estejam corretos antes de adicionar o evento ao Escalonador.
 * **Fim do algoritmo. Agendar nova chegada.** -- Aviso do final do algoritmo de chegada, quando é necessário agendar uma nova Chegada para dar continuidade à Simulação.
 * **X: 1.428899972E9 a: 2.145853745E9 c: 1.432159778E9 M: 4.294967296E9** -- Parâmetros para cálculo do próximo número pseudoaleatório.
-* **Número Pseudoaleatório gerado: 0.133223295211792.** -- O próximo número pseudoaleatório gerado já distribuido uniformemente.
+* **Número Pseudoaleatório gerado: 0.133223295211792.** -- O próximo número pseudoaleatório gerado já distribuído uniformemente.
 * **Evento gerado: [CH, 4.399669885635376]** -- O evento gerado pelo algoritmo.
 * **Fila [Status=1, Capacidade=5, Servidores=1, Atendidos=0, Perdas=0, Estados=[2.0, 0.0, 0.0, 0.0, 0.0, 0.0]]** -- O estado da fila após a simulação de um evento.
 
