@@ -37,7 +37,7 @@ Fila [Status=1, Capacidade=5, Servidores=1, Atendidos=0, Perdas=0, Estados=[2.0,
 Uma breve explicação das informações geradas:
 * **Próximo evento do escalonador: [CH, 2.0]** -- O evento do Escalonador que será simulado. É necessário garantir a correta sequência dos eventos ordenados pelo tempo. 
 * **Delta tempo: 2.0** -- Cálculo da variação de tempo (Tempo Global - Tempo do Evento Agendado). É o valor de tempo a ser acumulado em uma posição do vetor de Estados da Fila.
-* **Tempo Global: 2.0** //Atualização do tempo global da simulação, parte do algoritmo de Chegada.
+* **Tempo Global: 2.0** -- Atualização do tempo global da simulação, parte do algoritmo de Chegada.
 * **Pode entrar na fila (Status=0 < Capacidade=5)? true** -- Parte do algoritmo de Chegada que verifica se permite ou não a entrada de um cliente na Fila. Se true, o cliente entra na fila; senão, uma perda é contabilizada.
 * **Acumular tempo no estado 0 da fila: 2.0** -- Exibe o valor de tempo a ser acumulado na posição do vetor de estados da fila (deve ser acumulado antes de incrementar o número de clientes na fila).
 * **Incrementar fila -> clientes: 1** -- Parte do algoritmo de chegada. Exibe o número atual de clientes na fila.
