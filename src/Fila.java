@@ -3,16 +3,24 @@ import java.util.Arrays;
 public class Fila {
 
 	int status;
-	int capacidade;
 	int servidores;
+	int capacidade;
+	double chegadaMin;
+	double chegadaMax;
+	double saidaMin;
+	double saidaMax;
 	int atendidos;
 	int perdas;
 	double [] estados;
 
-	public Fila(int servidores, int capacidade) {
+	public Fila(int servidores, int capacidade, double chegadaMin, double chegadaMax, double saidaMin, double saidaMax) {
 		this.servidores = servidores;
 		this.capacidade = capacidade;
-		this.estados = new double [capacidade+1]; //Estados totais da fila: K+1 
+		this.estados = new double [capacidade+1]; //Estados totais da fila: K+1
+		this.chegadaMin = chegadaMin;
+		this.chegadaMax = chegadaMax;
+		this.saidaMin = saidaMin;
+		this.saidaMax = saidaMax;
 	}
 
 	public int getStatus() {
@@ -54,7 +62,13 @@ public class Fila {
 
 	@Override
 	public String toString() {
-		return "Fila [Status=" + status + ", Capacidade=" + capacidade + ", Servidores=" + servidores + ", Atendidos="
-				+ atendidos + ", Perdas=" + perdas + ", Estados=" + Arrays.toString(estados) + "]";
+		return "Fila ["
+				+ "Status=" + status
+				+ ", Servidores=" + servidores
+				+ ", Capacidade=" + capacidade
+				+ ", Atendidos=" + atendidos
+				+ ", Perdas=" + perdas
+				+ ", Estados=" + Arrays.toString(estados)
+				+ "]";
 	}
 }
