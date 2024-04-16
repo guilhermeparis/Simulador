@@ -5,7 +5,6 @@ public class Gerador {
 	double c;
 	double M;
 
-
 	public Gerador(double seed, double a, double c, double M) {
 		super();
 		this.seed = seed;
@@ -14,10 +13,8 @@ public class Gerador {
 		this.M = M;
 	}
 
-
 	public double next() {
 		seed = (seed * a + c) % M;
 		return seed / M;
 	}
 }
-

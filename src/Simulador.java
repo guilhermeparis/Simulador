@@ -1,11 +1,12 @@
-/* Simulação 1: G/G/1/5 Chegada: 2..5 Saída: 3..5
- * Simulação 2: G/G/2/5 Chegada: 2..5 Saída: 3..5
+/* Fila 1 - G/G/2/3, chegadas entre 1..4, atendimento entre 3..4
+ * Fila 2 - G/G/1/5, atendimento entre 2..3
  * 
- * Para ambas simulações, considere inicialmente a fila vazia e o primeiro cliente chega no tempo 2,0.
- * Realize a simulação com 100.000 aleatórios, ou seja, ao se utilizar o 100.000 aleatório, sua simulação deve se encerrar e a
- * distribuição de probabilidades, bem como os tempos acumulados para os estados da fila devem ser reportados. Além disso,
- * indique o número de perda de clientes (caso tenha havido perda) e o tempo global da simulação.
- *  
+ * Para a simulação, considere inicialmente as filas vazias e o primeiro cliente chega no tempo 1,5.
+ * Realizem a simulação com 100.000 aleatórios, ou seja, ao se utilizar o 100.000 aleatório, asimulação deve
+ * se encerrar e a distribuição de probabilidades, bem como os tempos acumulados para os estados de cada fila
+ * devem ser reportados. Além disso, indique o número de perda de clientes (caso tenha havido perda) de cada
+ * fila e o tempo global da simulação.
+ * 
  * A/B/C/K/N/D
  * A: distribuição do intervalo de chegada
  * B: distribuição do intervalo de saída
@@ -20,86 +21,144 @@ public class Simulador {
 
 	public static void main(String[] args)
 	{
-		double tempoGlobal = 0;
-		int count = 100000; //Variável de controle da simulação
+		//Variáveis de controle da simulação
+		double tempoGlobal = 0; 
+		int count = 100000;
 
+		//Iniciar a fila. Ordem dos parâmetros: Servidores, Capacidade, Intervalos Médio de chegada e Intervalos médios de Saída
+		Fila fila1 = new Fila(2, 3, 1.0, 4.0, 3.0, 4.0);
+		System.out.println("Estado inicial da Fila 1: " + fila1.toString());
+		Fila fila2 = new Fila(1, 5, 0.0, 0.0, 2.0, 3.0);
+		System.out.println("Estado inicial da Fila 2: " + fila2.toString()+"\n");
+
+		//Iniciar o gerador e seus parâmetros.
+		double seed = 2.0;
+		double a = 2145853745.0;
+		double c = 1432159778.0;
+		double M = Math.pow(2, 32);
+		Gerador gerador = new Gerador(seed, a, c, M);
+
+		Evento eventoInicial = new Evento (1.5, "CH"); //Evento inicial da Simulação
 		
-		Fila fila = new Fila(1, 5); //Iniciar a fila
-		
-		double saidaT0 = 3.0, saidaT1 = 5.0, chegadaT0 = 2.0, chegadaT1 = 5.0; //Intervalos médios de chegada e de saída
-
-		double seed = 2.0, a = 2145853745, c = 1432159778, M = Math.pow(2, 32); //Parâmetros do Gerador de Números Pseudoaleatórios
-		Gerador gerador = new Gerador(seed, a, c, M); //Iniciar o Gerador
-
-		Escalonador escalonador = new Escalonador(); //Iniciar o Escalonador
-		Evento eventoInicial = new Evento (2.0, "CH"); //Evento inicial da Simulação
+		Escalonador escalonador = new Escalonador(); //Iniciar escalonador 
 		escalonador.eventoQueue.add(eventoInicial); //Evento inicial adicionado ao Escalonador
 
 		for (int i = 0; i < count; i++)
 		{
+			//Verificar o próximo evento do Escalonador.
 			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTempo(), escalonador.eventoQueue.poll().getTipo());
+
+			//EVENTO DE CHEGADA
 			if (eventoAux.getTipo() == "CH")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
 				tempoGlobal = eventoAux.getTempo();
-				if (fila.getStatus() < fila.getCapacidade())
-				{	
-					fila.in(deltaTempo);
-					if(fila.status <= fila.servidores)
+				
+				if (fila1.getStatus() < fila1.getCapacidade())
+				{
+					fila1.in(deltaTempo);
+					
+					if(fila1.getStatus() <= fila1.getServidores())
 					{
+						//Para Filas em Tandem, agendamos uma Passagem ao invés de uma Saída.
 						double nps = gerador.next();
-						double sorteio = saidaT0 + ((saidaT1-saidaT0) * nps);
-						//Evento e1: saída gerada pelo algoritmo de chegada
-						Evento e1 = new Evento ((tempoGlobal + sorteio), "SA");
-						escalonador.eventoQueue.add(e1);
+						double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
+						Evento e1 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e1: Passagem de cliente gerada pelo algoritmo de chegada.
+						escalonador.eventoQueue.add(e1); //Evento adicionado ao Escalonador.
 					}
-				} 
+					
+				}
+				
 				else
 				{
-					fila.loss();
+					fila1.loss();
 				}
-				//Fim do algoritmo de chegada. Agendar nova chegada para dar continuidade à Simulação.
+				
+				//Fim do algoritmo de Chegada. Agendar uma nova Chegada.
 				double nps = gerador.next();
-				double sorteio =  chegadaT0 + ((chegadaT1 - chegadaT0) * nps);
-				//Evento e2: chegada gerada pelo algoritmo de chegada
-				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH");
-				escalonador.eventoQueue.add(e2);
+				double sorteio =  fila1.chegadaMin + ((fila1.chegadaMax - fila1.chegadaMin) * nps);
+				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH"); //Evento de chegada gerado pelo fim do algoritmo de chegada.
+				escalonador.eventoQueue.add(e2); //Evento adicionado ao Escalonador.
 			}
+
+			//EVENTO DE SAÍDA
 			else if (eventoAux.getTipo() == "SA")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
 				tempoGlobal = eventoAux.getTempo(); 
-				fila.out(deltaTempo);
-				if (fila.status >= fila.servidores)
+				fila2.out(deltaTempo);
+				
+				if (fila2.getStatus() >= fila2.getServidores())
 				{
 					double nps = gerador.next();
-					double sorteio = saidaT0 + ((saidaT1-saidaT0) * nps);
-					//Evento e3: saída gerada pelo algoritmo de saída.
-					Evento e3 = new Evento ((tempoGlobal + sorteio), "SA");
-					escalonador.eventoQueue.add(e3);
+					double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
+					Evento e3 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e3: saída gerada pelo algoritmo de saída.
+					escalonador.eventoQueue.add(e3); //Evento adicionado ao Escalonador.
+				}	
+				
+			}//Fim do algoritmo de Saída.
+			
+			//EVENTO DE PASSAGEM
+			else if (eventoAux.getTipo() == "PA")
+			{
+				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
+				tempoGlobal = eventoAux.getTempo();
+				
+				//Saída da fila 1.
+				fila1.out(deltaTempo);
+				
+				if(fila1.getStatus() >= fila1.getServidores())
+				{
+					double nps = gerador.next();
+					double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
+					Evento e4 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e4: Passagem de clientes gerada pelo algoritmo de passagem.
+					escalonador.eventoQueue.add(e4);
 				}
 				
-			}//Fim do algoritmo de saída.
-			else
-			{
-				//To do: evento de passagem de clientes entre filas.
-			}
-		}//End loop principal da Simulação
+				//Chegada na fila 2.
+				if (fila2.getStatus() < fila2.getCapacidade())
+				{
+					fila2.in(deltaTempo);
+					
+					if(fila2.getStatus() <= fila2.getServidores())
+					{
+						double nps = gerador.next();
+						double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
+						Evento e5 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e5: Saída de cliente gerada pelo algoritmo de saída. 
+						escalonador.eventoQueue.add(e5); //Evento adicionado ao Escalonador.
+					}
+					
+				}
+				
+				else
+				{
+					fila2.loss();
+				}
+				
+			}//Fim do algoritmo de Passagem.
+			
+		}//Fim do loop principal da Simulação.
 
-		System.out.println("Fim da simulação.\n");
-
-		System.out.println("Distribuição de Probabilidads:\n");
-		for (int i = 0; i < fila.estados.length; i++) {
+		//Exibição dos Resultados da Simulação.
+		System.out.println("Resultados da simulação.\n");
+		System.out.println("Distribuição de Probabilidades da Fila 1: \n");
+		
+		for (int i = 0; i < fila1.estados.length; i++) {
 			System.out.println
-				("Estado["+i+"]"
-				+ " Tempo: " + (String.format("%,.2f", fila.estados[i]))
-				+ " Probabilidade: "+(String.format ("%,.10f",(fila.estados[i] / tempoGlobal)))
-				);
+			("Estado["+i+"] Tempo: "+(String.format("%,.2f", fila1.estados[i]))+" Probabilidade: "+(String.format ("%,.10f",(fila1.estados[i] / tempoGlobal))));
 		}
 		
-		System.out.println("\n" + fila.toString());
+		System.out.println("\nFila 1: " + fila1.toString() + "\n");
+		System.out.println("Distribuição de Probabilidades da Fila 2: \n");
 		
-		System.out.println("\nTempo Global de Simulação: " + tempoGlobal);
+		for (int i = 0; i < fila2.estados.length; i++) {
+			System.out.println
+			("Estado["+i+"] Tempo: " + (String.format("%,.2f", fila2.estados[i]))+" Probabilidade: "+(String.format ("%,.10f",(fila2.estados[i] / tempoGlobal))));
+		}
 		
-	}//End main
-}//End class
+		System.out.println("\nFila 2: " + fila2.toString() + "\n");
+		System.out.println("Tempo Global de Simulação: " + tempoGlobal);
+		
+	}//Fim da main.
+	
+}//Fim da classe.
