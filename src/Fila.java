@@ -45,13 +45,11 @@ public class Fila {
 
 	public void in(double tempo) {
 		estados[status] += tempo;
-		System.out.println(estados[status]);
 		this.status++;
 	}
 
 	public void out(double tempo) {
 		estados[status] += tempo;
-		System.out.println(estados[status]);
 		this.status--;
 		this.atendidos++;
 	}
@@ -62,7 +60,7 @@ public class Fila {
 
 	@Override
 	public String toString() {
-		return "Fila ["
+		return "["
 				+ "Status=" + status
 				+ ", Servidores=" + servidores
 				+ ", Capacidade=" + capacidade

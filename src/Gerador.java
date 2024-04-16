@@ -16,7 +16,7 @@ public class Gerador {
 
 
 	public double next() {
-		System.out.println("X: " + seed + " a: " + a + " c: " + c + " M: " + M);
+		System.out.print("X: " + seed + " a: " + a + " c: " + c + " M: " + M);
 		seed = (seed * a + c) % M;
 		return seed / M;
 	}
