@@ -21,33 +21,34 @@ public class Simulador {
 
 	public static void main(String[] args)
 	{
-
+		//Variáveis de controle da simulação
 		double tempoGlobal = 0; 
-		int count = 100000; //Variável de controle da simulação
-
-		//Iniciar a fila
-		//Ordem dos parâmetros: Servidores, Capacidade, Intervalos Médio de chegada e Intervalos médios de Saída
+		int k = 0;
+		int count = 10;
+		
+		//Iniciar a fila. Ordem dos parâmetros: Servidores, Capacidade, Intervalos Médio de chegada e Intervalos médios de Saída
 		Fila fila1 = new Fila(2, 3, 1.0, 4.0, 3.0, 4.0);
-		System.out.println("Estado inicial da fila 1: " + fila1.toString());
+		System.out.println("Estado inicial da Fila 1: " + fila1.toString());
 		Fila fila2 = new Fila(1, 5, 0.0, 0.0, 2.0, 3.0);
-		System.out.println("Estado inicial da fila 2: " + fila2.toString()+"\n");
+		System.out.println("Estado inicial da Fila 2: " + fila2.toString()+"\n");
 
-		//Parâmetros do Gerador de Números Pseudoaleatórios
+		//Iniciar o gerador e seus parâmetros.
 		double seed = 2.0;
 		double a = 2145853745.0;
 		double c = 1432159778.0;
 		double M = Math.pow(2, 32);
-		Gerador gerador = new Gerador(seed, a, c, M); //Iniciar o Gerador
+		Gerador gerador = new Gerador(seed, a, c, M);
 
 		Evento eventoInicial = new Evento (1.5, "CH"); //Evento inicial da Simulação
+
 		Escalonador escalonador = new Escalonador(); //Iniciar escalonador 
 		escalonador.eventoQueue.add(eventoInicial); //Evento inicial adicionado ao Escalonador
 
-		for (int i = 0; i < count; i++)
+		//Loop principal da Simulação
+		for (k = 0; k < count; k++)
 		{
-			System.out.println("Iteraçao: " + i);
-
-			//Ver qual o próximo evento do escalonador (o elemento no topo da Priority Queue)
+			System.out.println("Iteração: " + k);
+			//Verificar o próximo evento do Escalonador.
 			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTempo(), escalonador.eventoQueue.poll().getTipo());
 			System.out.println("Evento do escalonador: " + eventoAux.toString());
 
@@ -66,8 +67,6 @@ public class Simulador {
 					fila1.in(deltaTempo);
 					System.out.println("Incrementar fila 1 -> Clientes: " + fila1.getStatus());
 					System.out.println("Fila 1: " + fila1.toString());
-					
-					System.out.print("Está de frente para o servidor? " + (fila1.getStatus() <= fila1.getServidores()) + " -> ");
 
 					if(fila1.getStatus() <= fila1.getServidores())
 					{
@@ -76,37 +75,39 @@ public class Simulador {
 						double nps = gerador.next();
 						System.out.println(" NPS gerado: " + nps);
 						double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
-						//Evento e1: Passagem de cliente gerada pelo algoritmo de chegada
-						Evento e1 = new Evento ((tempoGlobal + sorteio), "PA");
-						escalonador.eventoQueue.add(e1);
+						Evento e1 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e1: Passagem de cliente gerada pelo algoritmo de chegada.
+						escalonador.eventoQueue.add(e1); //Evento adicionado ao Escalonador.
 						System.out.println("Evento gerado: " + e1.toString());
 					}
 					else
 					{
 						System.out.println("Não há servidor disponível para atender na fila 1.");
 					}
-				} 
+				}
+				
 				else
 				{
 					//Não pôde entrar na fila
 					fila1.loss();
 					System.out.println("Não pôde entrar na fila 1. Perdas contabilizadas: " + fila1.getPerdas());
 				}
+				
+				//Fim do algoritmo de Chegada. Agendar uma nova Chegada.
 				System.out.println("Fim do algoritmo. Agendar uma nova Chegada. ");
 				double nps = gerador.next();
 				System.out.println(" NPS gerado: " + nps);
 				double sorteio =  fila1.chegadaMin + ((fila1.chegadaMax - fila1.chegadaMin) * nps);
-				//Evento e2: chegada gerada pelo algoritmo de chegada
-				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH");
-				escalonador.eventoQueue.add(e2);
-				System.out.println("Evento gerado: " + e2.toString());
+				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH"); //Evento de chegada gerado pelo fim do algoritmo de chegada.
+				escalonador.eventoQueue.add(e2); //Evento adicionado ao Escalonador.
+				System.out.println("Evento gerado: " + e2.toString()+"\n");
 			}
 
-			//EVENTO DE SAIDA
+			//EVENTO DE SAÍDA
 			else if (eventoAux.getTipo() == "SA")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
 				tempoGlobal = eventoAux.getTempo(); 
+
 				System.out.println("Tempo Global: " + tempoGlobal);
 				System.out.println("Acumular variação de tempo (" + deltaTempo + ") no estado " + fila2.getStatus() + " da fila 2. ");
 				fila2.out(deltaTempo);
@@ -120,17 +121,18 @@ public class Simulador {
 					double nps = gerador.next();
 					System.out.println(" NPS gerado: " + nps);
 					double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
-					//Evento e3: saída gerada pelo algoritmo de saída.
-					Evento e3 = new Evento ((tempoGlobal + sorteio), "SA");
-					escalonador.eventoQueue.add(e3);
+					Evento e3 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e3: saída gerada pelo algoritmo de saída.
+					escalonador.eventoQueue.add(e3); //Evento adicionado ao Escalonador.
 					System.out.println("Evento gerado: " + e3.toString());
 				}
 				else
 				{
-					System.out.println((fila2.getStatus() >= fila2.getServidores()) + ": não é necessário agendar mais saídas.");
+					System.out.println(": não é necessário agendar mais saídas.");
 				}
-				System.out.println("Fim do algoritmo de saída.");
-			}
+
+				System.out.println("Fim do algoritmo de saída.\n");
+			}//Fim do algoritmo de Saída.
+			
 
 			//EVENTO DE PASSAGEM
 			else if (eventoAux.getTipo() == "PA")
@@ -139,92 +141,90 @@ public class Simulador {
 				tempoGlobal = eventoAux.getTempo();
 				System.out.println("Tempo Global: " + tempoGlobal);
 
-				System.out.println("Acumular variação de tempo (" + deltaTempo + ") no estado " + fila1.getStatus() + " da fila 1. ");
+				//Saída da fila 1.
+				System.out.println("Cliente saiu na fila 1.");
+				System.out.println("Acumular variação de tempo (" + deltaTempo + ") no estado " + fila1.getStatus() + " da fila 1.");
 				fila1.out(deltaTempo);
-				System.out.println("Cliente saiu da fila 1. Estado atual: " + fila1.getStatus());
+				System.out.println("Decrementar fila 1 -> Clientes: " + fila1.getStatus());
 				System.out.println("Fila 1: " + fila1.toString());
-				
-				System.out.println("Precisa agendar mais passagens da fila 1? " + (fila1.getStatus() >= fila1.getServidores()));
+
+				System.out.print("Precisa agendar mais passagens da fila 1? " + (fila1.getStatus() >= fila1.getServidores()));
 				if(fila1.getStatus() >= fila1.getServidores())
 				{
-					System.out.println("Agendar uma Passagem de cliente. ");
+					System.out.println("Agendar uma Passagem de cliente.");
 					double nps = gerador.next();
 					System.out.println(" NPS gerado: " + nps);
 					double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
-					//Evento e4: passagem de clientes gerada pelo algoritmo de passagem
-					Evento e4 = new Evento ((tempoGlobal + sorteio), "PA");
+					Evento e4 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e4: Passagem de clientes gerada pelo algoritmo de passagem.
 					escalonador.eventoQueue.add(e4);
 					System.out.println("Evento gerado: " + e4.toString());
 				}
+				else
+				{
+					System.out.println(": não é necessário agendar mais passagens.");
+				}
 
-				//Chegada na fila 2
+				//Chegada na fila 2.
 				System.out.println("Pode entrar na fila 2? " + (fila2.getStatus() < fila2.getCapacidade()));
 				if (fila2.getStatus() < fila2.getCapacidade())
 				{
 					System.out.println("Cliente entrou na fila 2.");
 					System.out.println("Acumular variação de tempo (" + deltaTempo + ") no estado " + fila2.getStatus() + " da fila 2. ");
 					fila2.in(deltaTempo);
-					System.out.println("Incrementar fila 2 -> clientes: " + fila2.getStatus());
+					System.out.println("Incrementar fila 2 -> Clientes: " + fila2.getStatus());
 					System.out.println("Fila 2: " + fila2.toString());
-					
-					System.out.print("Está de frente para o servidor? " + (fila2.getStatus() <= fila2.getServidores()) + " -> ");
 
+					System.out.print("Está de frente para o servidor? " + (fila2.getStatus() <= fila2.getServidores()) + " -> ");
 					if(fila2.getStatus() <= fila2.getServidores())
 					{
 						System.out.println("Agendar uma Saída. ");
 						double nps = gerador.next();
 						System.out.println(" NPS: " + nps);
 						double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
-						//Evento e5: Saída de cliente gerada pelo algoritmo de saída
-						Evento e5 = new Evento ((tempoGlobal + sorteio), "SA");
-						escalonador.eventoQueue.add(e5);
+						Evento e5 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e5: Saída de cliente gerada pelo algoritmo de saída. 
+						escalonador.eventoQueue.add(e5); //Evento adicionado ao Escalonador.
 						System.out.println("Evento gerado: " + e5.toString());
 					}
 					else
 					{
 						System.out.println("Não há servidor disponível para atender na fila 2.");
 					}
-				} 
+
+				}
+
 				else
 				{
 					//Não pôde entrar na fila 2
 					fila2.loss();
 					System.out.println("Não pôde entrar na fila 2. Perdas contabilizadas: " + fila2.getPerdas());
 				}
-			}
-			System.out.println("");
 
-		}//End loop principal da Simulação
+				System.out.println("Fim do algoritmo de Passagem.\n");
+			}//Fim do algoritmo de Passagem.
 
-		System.out.println("Fim da simulação.\n");
+		}//Fim do loop principal da Simulação.
+		
+		//Exibição dos Resultados da Simulação.
+		System.out.println("Resultados da simulação.\n");
+		System.out.println("Total de iterações: " + k + "\n");
 		System.out.println("Distribuição de Probabilidades da Fila 1: \n");
 
 		for (int i = 0; i < fila1.estados.length; i++) {
 			System.out.println
-			("Estado["+i+"]"
-					+ " Tempo: " + (String.format("%,.2f", fila1.estados[i]))
-					+ " Probabilidade: "+(String.format ("%,.10f",(fila1.estados[i] / tempoGlobal)))
-					);
+			("Estado["+i+"] Tempo: "+(String.format("%,.2f", fila1.estados[i]))+" Probabilidade: "+(String.format ("%,.10f",(fila1.estados[i] / tempoGlobal))));
 		}
-		
-		System.out.println("\n" + fila1.toString() + "\n");
 
+		System.out.println("\nFila 1: " + fila1.toString() + "\n");
 		System.out.println("Distribuição de Probabilidades da Fila 2: \n");
-		
 
 		for (int i = 0; i < fila2.estados.length; i++) {
 			System.out.println
-			("Estado["+i+"]"
-					+ " Tempo: " + (String.format("%,.2f", fila2.estados[i]))
-					+ " Probabilidade: "+(String.format ("%,.10f",(fila2.estados[i] / tempoGlobal)))
-					);
+			("Estado["+i+"] Tempo: " + (String.format("%,.2f", fila2.estados[i]))+" Probabilidade: "+(String.format ("%,.10f",(fila2.estados[i] / tempoGlobal))));
 		}
 
-		System.out.println("\n" + fila2.toString() + "\n");
-
-		
+		System.out.println("\nFila 2: " + fila2.toString() + "\n");
 		System.out.println("Tempo Global de Simulação: " + tempoGlobal);
 
-	}//End main
+	}//Fim da main.
 
-}//End class
+}//Fim da classe.
