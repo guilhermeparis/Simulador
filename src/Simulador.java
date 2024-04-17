@@ -24,7 +24,7 @@ public class Simulador {
 		//Variáveis de controle da simulação
 		double tempoGlobal = 0; 
 		int k = 0;
-		int count = 10;
+		int count = 100000;
 		
 		//Iniciar a fila. Ordem dos parâmetros: Servidores, Capacidade, Intervalos Médio de chegada e Intervalos médios de Saída
 		Fila fila1 = new Fila(2, 3, 1.0, 4.0, 3.0, 4.0);
@@ -58,7 +58,7 @@ public class Simulador {
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
 				tempoGlobal = eventoAux.getTempo();
 				System.out.println("Tempo Global: " + tempoGlobal);
-				System.out.println("Pode entrar na fila 1? " + (fila1.getStatus() < fila1.getCapacidade()));
+				System.out.print("Pode entrar na fila 1? " + (fila1.getStatus() < fila1.getCapacidade()) + " -> ");
 
 				if (fila1.getStatus() < fila1.getCapacidade())
 				{
@@ -67,11 +67,12 @@ public class Simulador {
 					fila1.in(deltaTempo);
 					System.out.println("Incrementar fila 1 -> Clientes: " + fila1.getStatus());
 					System.out.println("Fila 1: " + fila1.toString());
+					System.out.print("Está de frente para um servidor? " + (fila1.getStatus() <= fila1.getServidores()) + " -> ");
 
 					if(fila1.getStatus() <= fila1.getServidores())
 					{
 						//Para Filas em Tandem, agendamos uma Passagem ao invés de uma Saída.
-						System.out.println("Agendar uma Passagem de cliente. ");
+						System.out.println("Agendar uma Passagem de cliente.");
 						double nps = gerador.next();
 						System.out.println(" NPS gerado: " + nps);
 						double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
@@ -114,7 +115,7 @@ public class Simulador {
 				System.out.println("Cliente saiu. Estado atual da fila: " + fila2.getStatus());
 				System.out.println("Fila 2: " + fila2.toString());
 
-				System.out.print("Há mais clientes para atender na fila 2? " + (fila2.getStatus() >= fila2.getServidores()) + " -> ");
+				System.out.print("Ainda há cliente de frente para um servidor disponível? " + (fila2.getStatus() >= fila2.getServidores()) + " -> ");
 				if (fila2.getStatus() >= fila2.getServidores())
 				{
 					System.out.println("Agendar uma Saída.");
@@ -127,7 +128,7 @@ public class Simulador {
 				}
 				else
 				{
-					System.out.println(": não é necessário agendar mais saídas.");
+					System.out.println("Não é necessário agendar mais saídas.");
 				}
 
 				System.out.println("Fim do algoritmo de saída.\n");
@@ -148,7 +149,7 @@ public class Simulador {
 				System.out.println("Decrementar fila 1 -> Clientes: " + fila1.getStatus());
 				System.out.println("Fila 1: " + fila1.toString());
 
-				System.out.print("Precisa agendar mais passagens da fila 1? " + (fila1.getStatus() >= fila1.getServidores()));
+				System.out.print("Precisa agendar mais passagens da Fila 1? " + (fila1.getStatus() >= fila1.getServidores()) + " -> ");
 				if(fila1.getStatus() >= fila1.getServidores())
 				{
 					System.out.println("Agendar uma Passagem de cliente.");
@@ -161,11 +162,11 @@ public class Simulador {
 				}
 				else
 				{
-					System.out.println(": não é necessário agendar mais passagens.");
+					System.out.println("Não é necessário agendar mais passagens.");
 				}
 
 				//Chegada na fila 2.
-				System.out.println("Pode entrar na fila 2? " + (fila2.getStatus() < fila2.getCapacidade()));
+				System.out.print("Pode entrar na fila 2? " + (fila2.getStatus() < fila2.getCapacidade()) + " -> ");
 				if (fila2.getStatus() < fila2.getCapacidade())
 				{
 					System.out.println("Cliente entrou na fila 2.");
