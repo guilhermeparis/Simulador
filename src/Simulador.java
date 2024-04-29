@@ -1,13 +1,18 @@
-/* Fila 1 - G/G/2/3, chegadas entre 1..4, atendimento entre 3..4
- * Fila 2 - G/G/1/5, atendimento entre 2..3
+/* Fila 1: G/G/1 chegadas: 2..4 saídas: 1..2
+ * Fila 2: G/G/2/5 saídas: 4..8
+ * Fila 3: G/G/2/10 saidas: 5..15
  * 
- * Para a simulação, considere inicialmente as filas vazias e o primeiro cliente chega no tempo 1,5.
- * Realizem a simulação com 100.000 aleatórios, ou seja, ao se utilizar o 100.000 aleatório, asimulação deve
- * se encerrar e a distribuição de probabilidades, bem como os tempos acumulados para os estados de cada fila
- * devem ser reportados. Além disso, indique o número de perda de clientes (caso tenha havido perda) de cada
- * fila e o tempo global da simulação.
+ * Roteamentos
+ * Fila 1: 0.8 para Fila 2 e 0.2 para Fila 3
+ * Fila 2: 0.3 retorna para Fila 1, 0.2 sai do sistema, 0.5 retorna para Fila 2
+ * Fila 3: 0.3 sai do sistema, 0.7 retorna para Fila 3
  * 
- * A/B/C/K/N/D
+ * Para a simulação, considere inicialmente as filas vazias e que o primeiro cliente chega no tempo 2,0. Realizem a
+ * simulação com 100.000 aleatórios, ou seja, ao se utilizar o 100.000 aleatório, a simulação deve se encerrar e a
+ * distribuição de probabilidades, bem como os tempos acumulados para os estados de cada fila devem ser reportados. 
+ * Além disso, indique o número de perda de clientes (caso tenha havido perda) de cada fila e o tempo global da simulação.
+ * 
+ * Notação de Kendall: A/B/C/K/N/D
  * A: distribuição do intervalo de chegada
  * B: distribuição do intervalo de saída
  * C: servidores da fila
@@ -23,7 +28,6 @@ public class Simulador {
 	{
 		//Variáveis de controle da simulação
 		double tempoGlobal = 0; 
-		int count = 100000;
 
 		//Iniciar a fila. Ordem dos parâmetros: Servidores, Capacidade, Intervalos Médio de chegada e Intervalos médios de Saída
 		Fila fila1 = new Fila(2, 3, 1.0, 4.0, 3.0, 4.0);
@@ -38,18 +42,18 @@ public class Simulador {
 		double M = Math.pow(2, 32);
 		Gerador gerador = new Gerador(seed, a, c, M);
 
-		Evento eventoInicial = new Evento (1.5, "CH"); //Evento inicial da Simulação
+		Evento eventoInicial = new Evento ("CH1", 1.5); //Evento inicial da Simulação
 		
 		Escalonador escalonador = new Escalonador(); //Iniciar escalonador 
 		escalonador.eventoQueue.add(eventoInicial); //Evento inicial adicionado ao Escalonador
 
-		for (int i = 0; i < count; i++)
+		while (gerador.count < 100000)
 		{
 			//Verificar o próximo evento do Escalonador.
-			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTempo(), escalonador.eventoQueue.poll().getTipo());
+			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTipo(), escalonador.eventoQueue.poll().getTempo());
 
 			//EVENTO DE CHEGADA
-			if (eventoAux.getTipo() == "CH")
+			if (eventoAux.getTipo() == "CH1")
 			{
 				double deltaTempo = eventoAux.getTempo() - tempoGlobal;
 				tempoGlobal = eventoAux.getTempo();
@@ -60,11 +64,10 @@ public class Simulador {
 					
 					if(fila1.getStatus() <= fila1.getServidores())
 					{
-						//Para Filas em Tandem, agendamos uma Passagem ao invés de uma Saída.
 						double nps = gerador.next();
 						double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
-						Evento e1 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e1: Passagem de cliente gerada pelo algoritmo de chegada.
-						escalonador.eventoQueue.add(e1); //Evento adicionado ao Escalonador.
+						Evento e = new Evento ("PA12", (tempoGlobal + sorteio));
+						escalonador.eventoQueue.add(e);
 					}
 					
 				}
@@ -77,8 +80,8 @@ public class Simulador {
 				//Fim do algoritmo de Chegada. Agendar uma nova Chegada.
 				double nps = gerador.next();
 				double sorteio =  fila1.chegadaMin + ((fila1.chegadaMax - fila1.chegadaMin) * nps);
-				Evento e2 = new Evento ((tempoGlobal + sorteio), "CH"); //Evento de chegada gerado pelo fim do algoritmo de chegada.
-				escalonador.eventoQueue.add(e2); //Evento adicionado ao Escalonador.
+				Evento e2 = new Evento ("CH1", (tempoGlobal + sorteio));
+				escalonador.eventoQueue.add(e2);
 			}
 
 			//EVENTO DE SAÍDA
@@ -92,8 +95,8 @@ public class Simulador {
 				{
 					double nps = gerador.next();
 					double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
-					Evento e3 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e3: saída gerada pelo algoritmo de saída.
-					escalonador.eventoQueue.add(e3); //Evento adicionado ao Escalonador.
+					Evento e = new Evento ("SA", (tempoGlobal + sorteio));
+					escalonador.eventoQueue.add(e); //Evento adicionado ao Escalonador.
 				}	
 				
 			}//Fim do algoritmo de Saída.
@@ -111,8 +114,8 @@ public class Simulador {
 				{
 					double nps = gerador.next();
 					double sorteio = fila1.saidaMin + ((fila1.saidaMax-fila1.saidaMin) * nps);
-					Evento e4 = new Evento ((tempoGlobal + sorteio), "PA"); //Evento e4: Passagem de clientes gerada pelo algoritmo de passagem.
-					escalonador.eventoQueue.add(e4);
+					Evento e = new Evento ("PA", (tempoGlobal + sorteio));
+					escalonador.eventoQueue.add(e);
 				}
 				
 				//Chegada na fila 2.
@@ -124,8 +127,8 @@ public class Simulador {
 					{
 						double nps = gerador.next();
 						double sorteio = fila2.saidaMin + ((fila2.saidaMax-fila2.saidaMin) * nps);
-						Evento e5 = new Evento ((tempoGlobal + sorteio), "SA"); //Evento e5: Saída de cliente gerada pelo algoritmo de saída. 
-						escalonador.eventoQueue.add(e5); //Evento adicionado ao Escalonador.
+						Evento e = new Evento ("SA", (tempoGlobal + sorteio)); 
+						escalonador.eventoQueue.add(e);
 					}
 					
 				}

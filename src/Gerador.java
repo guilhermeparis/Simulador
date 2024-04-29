@@ -4,6 +4,7 @@ public class Gerador {
 	double a;
 	double c;
 	double M;
+	int count;
 
 	public Gerador(double seed, double a, double c, double M) {
 		super();
@@ -15,6 +16,7 @@ public class Gerador {
 
 	public double next() {
 		seed = (seed * a + c) % M;
+		count++;
 		return seed / M;
 	}
 }
