@@ -45,9 +45,9 @@ public class Simulador {
 		escalonador.eventoQueue.add(eventoInicial); //Evento inicial adicionado ao Escalonador
 
 		//Loop principal da Simulação
-		for (k = 0; k < count; k++)
+		while (gerador.count < 100000)
 		{
-			System.out.println("Iteração: " + k);
+			System.out.println("Iteração: " + (gerador.count));
 			//Verificar o próximo evento do Escalonador.
 			Evento eventoAux = new Evento (escalonador.eventoQueue.peek().getTempo(), escalonador.eventoQueue.poll().getTipo());
 			System.out.println("Evento do escalonador: " + eventoAux.toString());
